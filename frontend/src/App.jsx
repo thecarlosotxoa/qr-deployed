@@ -1,35 +1,191 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import React, { useState, useEffect } from "react";
+import SignupPopup from "./components/SignupPopup";
+import LoginPopup from "./components/LoginPopup";
+import ProfilePage from "./components/ProfilePage"; // Profile component
+import { getUserProfile, saveQRCode, logoutUser } from "./services/userService";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toastify
+import { Oval } from "react-loader-spinner"; // Import spinner component from react-loader-spinner
+import { API_BASE_URL } from "./userService"; // Import base URL for backend API
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [inputValue, setInputValue] = useState(""); // State to hold user input
+  const [imgSrc, setImgSrc] = useState(null); // State to hold the generated QR code image
+  const [error, setError] = useState(null); // State to hold any error messages
+  const [isGenerating, setIsGenerating] = useState(false); // State to track loading status for QR code generation
+
+  // States for controlling popup visibility
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [showSignupPopup, setShowSignupPopup] = useState(false);
+  const [user, setUser] = useState(null); // To track logged-in user  
+  const [userLoading, setUserLoading] = useState(true); // New state for user loading to avoid race conditions
+
+  // Fetch profile if logged in
+  useEffect(() => {
+    async function fetchProfile() {
+      const profile = await getUserProfile();
+      if (profile) setUser(profile);
+      setUserLoading(false); // Set loading to false after fetching
+    }
+    fetchProfile();
+  }, []);
+
+  // Handler for form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsGenerating(true); // Set loading state to true
+
+    try {
+      // Use API_BASE_URL for backend URL instead of hardcoded localhost
+      const response = await fetch(`${API_BASE_URL}/generate-qr`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data: inputValue }), // Send the input value as JSON data
+      });
+
+      const data = await response.json();
+      if (data.qr_code) {
+        setImgSrc(`data:image/png;base64,${data.qr_code}`);
+        toast.success("QR code generated successfully!"); // Show success toast on successful QR code generation
+
+        // If the user is logged in, save the QR code in the database
+        if (user) {
+          await saveQRCode(inputValue, data.qr_code);
+        }
+      } else {
+        throw new Error(data.error || "Failed to generate QR code.");
+      }
+    } catch (err) {
+      toast.error(err.message); // Show error toast if there's an issue generating the QR code
+      setError(err.message);
+    } finally {
+      setIsGenerating(false); // Reset loading state after the operation completes
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="w-full min-h-screen bg-[#181818]">
+        {/* Toast Container for global notifications */}
+        <ToastContainer position="top-right" autoClose={5000} /> {/* Enables toast notifications globally */}
+
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <div className="flex flex-col items-center justify-center min-h-screen">
+                <div className="w-[23rem] p-7 space-y-4 text-slate-300">
+                  <h1 className="text-2xl font-semibold text-center text-slate-100">
+                    QR Code Generator
+                  </h1>
+
+                  {/* Display the generated QR code image or a placeholder */}
+                  {imgSrc ? (
+                    <img
+                      src={imgSrc}
+                      alt="Generated QR Code"
+                      className="w-full h-auto max-w-full cursor-pointer border border-neutral-200 rounded-3xl bg-white p-4"
+                    />
+                  ) : (
+                    <div className="w-full h-[18rem] border border-neutral-200 rounded-3xl grid place-content-center bg-[#202020]">
+                      <span className="text-neutral-400">No QR code generated</span>
+                    </div>
+                  )}
+
+                  {/* Display an error message if any */}
+                  {error && (
+                    <div className="w-full p-2 text-center text-red-500 border border-red-500 rounded">
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Form for entering text to generate a QR code */}
+                  <form className="space-y-1" onSubmit={handleSubmit}>
+                    <input
+                      type="text"
+                      className="bg-[#252525] rounded w-full p-2 focus:outline outline-neutral-300"
+                      placeholder="Enter text to generate QR code"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)} // Update state when the user types
+                    />
+                    <button
+                      type="submit"
+                      className="w-full py-3 flex justify-center bg-[#252525] hover:bg-neutral-600 duration-200 rounded"
+                      disabled={isGenerating} // Disable button while loading
+                    >
+                      {isGenerating ? (
+                        <Oval height={24} width={24} color="#ffffff" ariaLabel="loading" /> // Show spinner when loading
+                      ) : (
+                        "Generate"
+                      )}
+                    </button>
+                  </form>
+
+                  {/* Login/Logout/Profile Links */}
+                  <div className="text-center mt-4">
+                    {user ? (
+                      <>
+                        <span
+                          className="text-neutral-400 hover:text-neutral-300 cursor-pointer"
+                          onClick={() => logoutUser(setUser)}
+                        >
+                          Log out
+                        </span>
+                        <Link
+                          to="/profile"
+                          className="text-neutral-400 hover:text-neutral-300 cursor-pointer ml-4"
+                        >
+                          View Profile
+                        </Link>
+                      </>
+                    ) : (
+                      <span
+                        className="text-neutral-400 hover:text-neutral-300 cursor-pointer"
+                        onClick={() => setShowLoginPopup(true)}
+                      >
+                        Log in
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Show Login or Signup Popup */}
+                {showLoginPopup && (
+                  <LoginPopup
+                    onClose={() => setShowLoginPopup(false)}
+                    onSwitchToSignup={() => {
+                      setShowLoginPopup(false);
+                      setShowSignupPopup(true);
+                    }}
+                    setUser={setUser} // Pass setUser to handle user state after login
+                  />
+                )}
+                {showSignupPopup && (
+                  <SignupPopup
+                    onClose={() => setShowSignupPopup(false)}
+                    onSwitchToLogin={() => {
+                      setShowSignupPopup(false);
+                      setShowLoginPopup(true);
+                    }}
+                    setUser={setUser} // Pass setUser to handle user state after signup
+                  />
+                )}
+              </div>
+            }
+          />
+          <Route
+            path="/profile"
+            element={<ProfilePage user={user} userLoading={userLoading} setUser={setUser} />}
+          />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
