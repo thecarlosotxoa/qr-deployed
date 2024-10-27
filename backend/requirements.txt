@@ -1,0 +1,14 @@
+# Web framework and related packages
+Flask
+Flask-CORS
+Werkzeug
+flask-session
+
+# QR code generation
+qrcode
+
+# Other dependencies
+pillow  # Uncomment if needed for image processing
+# requests  # Uncomment if needed for HTTP requests
+
+psycopg2-binary
