@@ -1,2 +1,2 @@
 // src/config.js
-export const API_BASE_URL = "http://<EC2_PUBLIC_IP_OR_DOMAIN>:5000"; // Set to your backend URL
+export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL; // Set to your backend URL
