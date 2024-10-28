@@ -2,3 +2,4 @@ react-icons
 react-router-dom
 react-toastify
 react-loader-spinner
+dotenv

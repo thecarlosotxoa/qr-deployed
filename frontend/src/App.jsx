@@ -8,7 +8,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for react-toastify
 import { Oval } from "react-loader-spinner"; // Import spinner component from react-loader-spinner
-import { API_BASE_URL } from "./userService"; // Import base URL for backend API
+import { API_BASE_URL } from "./config"; // Import base URL for backend API
 
 function App() {
   const [inputValue, setInputValue] = useState(""); // State to hold user input
