@@ -61,7 +61,7 @@ function App() {
         throw new Error(data.error || "Failed to generate QR code.");
       }
     } catch (err) {
-      toast.error(err.message); // Show error toast if there's an issue generating the QR code
+      toast.error("Failed to generate QR code"); // Show error toast if there's an issue generating the QR code
       setError(err.message);
     } finally {
       setIsGenerating(false); // Reset loading state after the operation completes
