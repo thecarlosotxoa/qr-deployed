@@ -23,9 +23,9 @@ app.register_blueprint(auth_routes)
 app.register_blueprint(qr_routes)
 app.register_blueprint(user_routes)  # Register user routes
 
-# if __name__ == "__main__":
-    # app.run(debug=True, host="0.0.0.0", port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
     
 # local testing
-if __name__ == "__main__":    
-    app.run(debug=True, host='localhost', port=5000)
+# if __name__ == "__main__":    
+    # app.run(debug=True, host='localhost', port=5000)
