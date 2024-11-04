@@ -7,7 +7,7 @@ from utils.db import get_db_connection
 
 auth_routes = Blueprint("auth", __name__)
 
-@auth_routes.route("/register", methods=["POST"])
+@auth_routes.route("/api/register", methods=["POST"])
 def register_user():
     """Endpoint for user registration."""
     data = request.get_json()
@@ -48,7 +48,7 @@ def register_user():
     except Exception as e:
         return jsonify({"error": "An error occurred during registration."}), 500
 
-@auth_routes.route("/login", methods=["POST"])
+@auth_routes.route("/api/login", methods=["POST"])
 def login_user():
     """Endpoint for user login."""
     data = request.get_json()
@@ -75,7 +75,7 @@ def login_user():
     except Exception as e:
         return jsonify({"error": "An error occurred during login."}), 500
 
-@auth_routes.route("/logout", methods=["POST"])
+@auth_routes.route("/api/logout", methods=["POST"])
 def logout_user():
     """Endpoint for user logout."""
     session.pop("user_id", None)

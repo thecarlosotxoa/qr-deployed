@@ -16,7 +16,7 @@ app.config.from_object(Config)
 init_session(app)
 
 # Configure CORS with allowed frontend origin from Config
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": Config.FRONTEND_ORIGIN}})
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": Config.FRONTEND_ORIGIN}})
 
 # Register blueprints for route separation
 app.register_blueprint(auth_routes)

@@ -8,7 +8,7 @@ import re
 
 user_routes = Blueprint("user", __name__)
 
-@user_routes.route("/user/profile", methods=["GET"])
+@user_routes.route("/api/user/profile", methods=["GET"])
 def get_user_profile():
     """Endpoint to get the logged-in user's profile."""
     user_id = session.get("user_id")
@@ -30,7 +30,7 @@ def get_user_profile():
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching profile."}), 500
 
-@user_routes.route("/user/update-profile", methods=["POST"])
+@user_routes.route("/api/user/update-profile", methods=["POST"])
 def update_profile():
     """Endpoint to update user profile information."""
     user_id = session.get("user_id")
@@ -79,7 +79,7 @@ def update_profile():
     except Exception as e:
         return jsonify({"error": "An error occurred while updating profile."}), 500
 
-@user_routes.route("/user/delete-account", methods=["DELETE"])
+@user_routes.route("/api/user/delete-account", methods=["DELETE"])
 def delete_account():
     """Endpoint to delete a user account, with password confirmation."""
     user_id = session.get("user_id")
