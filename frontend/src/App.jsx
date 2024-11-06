@@ -117,6 +117,7 @@ function App() {
                       placeholder="Enter text to generate QR code"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)} // Update state when the user types
+                      maxLength={100} // Limit input to 100 characters
                     />
                     <button
                       type="submit"
