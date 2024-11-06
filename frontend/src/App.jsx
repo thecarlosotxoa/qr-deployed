@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import SignupPopup from "./components/SignupPopup";
 import LoginPopup from "./components/LoginPopup";
 import ProfilePage from "./components/ProfilePage"; // Profile component
+import AboutUs from "./components/AboutUs";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import TermsAndConditions from "./components/TermsAndConditions";
+import ContactUs from "./components/ContactUs";
 import { getUserProfile, saveQRCode, logoutUser } from "./services/userService";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
@@ -72,6 +76,7 @@ function App() {
     <Router>
       <div className="w-full min-h-screen bg-[#181818]">
         {/* Toast Container for global notifications */}
+        <div className="flex-grow">
         <ToastContainer position="top-right" autoClose={5000} /> {/* Enables toast notifications globally */}
 
         <Routes>
@@ -182,7 +187,27 @@ function App() {
             path="/profile"
             element={<ProfilePage user={user} userLoading={userLoading} setUser={setUser} />}
           />
+          {/* Add routes for static pages */}
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/contact" element={<ContactUs />} />
         </Routes>
+        </div>
+        {/* Footer */}
+        <footer className="w-full bg-[#202020] text-slate-400 py-4 text-center">
+          <div className="container mx-auto">
+            <p className="text-sm">
+              © {new Date().getFullYear()} Get QR Code Now. All rights reserved.
+            </p>
+            <div className="mt-2 space-x-4">
+              <Link to="/about" className="hover:text-slate-300">About Us</Link>
+              <Link to="/privacy-policy" className="hover:text-slate-300">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-slate-300">Terms and Conditions</Link>
+              <Link to="/contact" className="hover:text-slate-300">Contact Us</Link>
+            </div>
+          </div>
+        </footer>
       </div>
     </Router>
   );
